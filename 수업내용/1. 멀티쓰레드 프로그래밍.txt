@@ -1,0 +1,94 @@
+서버 프로그래밍은 식당 운영과 비슷하다.
+식당의 직원은 자기 스스로는 움직일 수 없고, 영혼이 들어가야만 움직일 수 있다고 가정하는데
+이 차이만 있다고 하자.
+
+레스토랑 - 프로세스(프로그램)
+직원 - 쓰레드
+영혼 - CPU 코어
+
+이다.
+
+영혼이 아주 빠른 속도로 각 직원에게 들어가 직원이 일하도록 돕는다.
+이 속도는 아주 빠르기 때문에, 각 직원이 멈추지 않고 모두 일하는 것처럼 보인다.
+
+한 프로세스의 서로 다른 쓰레드는 Heap과 Data 영역을 공유하며, 각자의 Stack 영역을 갖는다.
+
+
+쓰레드 관련 함수
+- t.hardware_concurrency();
+	. CPU 논리 코어 개수
+- t.get_id();
+	. 쓰레드마다 주어지는 고유 ID
+- t.detach();
+	. std::thread 객체에서 실제 쓰레드를 분리
+- t.joinable();
+	. join이 가능한지 확인 (실제로는 id가 0인지만 확인)
+- t.join();
+	. 해당 쓰레드가 종료될 때까지 대기
+
+
+unique_lock
+	. std::defer_lock을 통해 lock이 걸리는 시점을 제어할 수 있음.
+lock_guard
+	. unique_lock에 비해 조금이나마 가벼움
+std::adopt_lock
+	. lock_guard에 인자로 넘겨 이미 locking이 되어 있는 lock이라는 것을 lock_guard에 알린다.
+
+
+데드락
+- 두 개 이상의 작업이 서로가 점유하고 있는 자원을 무한히 기다리는 상황
+
+데드락의 원인
+- 다음 네 가지 조건이 만족되어야 한다.
+	. 상호 배제 : 자원을 동시에 쓸 수 없으며 한번에 한 프로세스만이 해당 자원을 사용할 수 있다.
+	. 점유 대기 : 한 자원을 사용하고 있으면서 다른 자원을 기다리는 상태
+	. 선점 불가 : 한 프로세스가 선점하고 있는 자원을 다른 프로세스가 가져올 수 없음
+	. 순환 대기 : 각자가 서로가 사용하는 자원을 얻으려고 대기하는 상황
+
+해결 방법?
+- 락을 클래스 등으로 래핑하여 락에 우선순위를 부여한다. (순환 대기 조건 해결)
+- 완전한 해결은 힘들다. 데드락이 발생했을 때 처리는 다른 버그에 비해 상대적으로 쉽다.
+- lock manager를 만들어 사이클이 발생했는지 확인한다.
+	. 1번 lock을 잡은 상태에서 2번 lock을 잡을 수 있다면 1 - 2번 간 경로가 존재한다는 의미이다.
+	. 2 - 3번 경로가 존재하고, 다시 3 - 1번 경로가 존재한다면 데드락의 발생 위험이 있다.
+	. union find?
+
+
+스핀락
+- 나이브하게 스핀락을 구현해 보자
+class SpinLock
+{
+public:
+	void lock() {
+		while (m_locked) {}
+		m_locked = true;
+	}
+	void unlock() {
+		m_locked = false;
+	}
+
+private:
+	bool m_locked = false;
+};
+오동작한다.
+우선 volatile이 없다. 따라서 m_locked의 최적화가 들어간다.
+그러나 이 문제만은 아니다.
+
+화장실에 들어가는 행동(m_lock이 false임을 확인), 자물쇠를 잠그는 행동(m_lock = true)은 한 번에 일어나야 한다.
+거의 두 명의 사람이 동시에 화장실에 입장해 서로 자물쇠를 잠그려고 시도해서는 안된다.
+그런데 이 행동이 원자적으로 일어나지 않는다.
+
+CAS (Compare And Swap)
+atomic_bool의 compare_exchange_strong 함수는 bool 타입 expected와 desired를 인자로 받아
+객체와 expected가 같다면 객체를 desired로 바꾸고 true 리턴
+객체와 expected가 다르다면 expected를 객체로 바꾸고 false를 리턴한다.
+그리고 이 과정이 원자적으로 일어난다.
+
+bool expected = false;
+const bool desired = true;
+
+while (m_locked.compare_exchange_strong(expected, desired) == false) 
+{
+	expected = false;
+}
+이와 같이 m_lock이 false임을 확인하고 이를 true로 바꾸는 행동을 원자적으로 실시할 수 있다.
