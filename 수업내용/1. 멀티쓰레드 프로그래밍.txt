@@ -92,3 +92,62 @@ while (m_locked.compare_exchange_strong(expected, desired) == false)
 	expected = false;
 }
 이와 같이 m_lock이 false임을 확인하고 이를 true로 바꾸는 행동을 원자적으로 실시할 수 있다.
+
+
+Sleep
+- 락을 얻을 수 없을 때 일단 자리로, 나중에 다시 시도
+
+- this_thread::sleep_for();
+- this_thread::yield();
+	. 할당받은 time slice를 포기하고 다른 쓰레드에 넘긴다.
+
+
+이벤트
+- 직원(커널)이 통보해 줄 때까지 쓰레드는 잠든 상태가 된다.
+
+- CreateEvent
+	. MenualReset
+	  true시 MenualReset(수동 리셋), false시 AutoReset(자동 리셋)
+
+
+조건 변수(Condition Variable)
+- 어떤 조건을 만족할 때까지 쓰레드를 재운다.
+- 표준 mutex와 연동되어 동작 (그렇게 하지 않으려면 condition_variable_any 사용)
+- 이벤트와 같은 커널 오브젝트가 아닌 User-Level Object
+  즉 다른 프로그램끼리 동기화할 수 없고 동일한 프로그램 내에서만 동기화할 수 있음
+
+- condition_variable::notify_one()
+	. 조건이 거짓인 바람에 자고 있는 쓰레드들 중 하나를 깨워서 조건을 검사한다.
+- condition_variable::notify_all()
+	. 조건이 거짓인 바람에 자고 있는 쓰레드 모두를 깨워서 조건을 검사한다.
+- condition_variable::wait()
+	. unique_lock을 인자로 받아 lock을 걸 수 있으면 건다.
+	  조건을 만족할 경우 빠져나가 코드를 진행한다.
+	  만족하지 않을 경우 lock을 풀어 주고 다시 잠든다.
+
+
+미래 객체(future)
+- C++에서 비동기 작업을 위해 thread와 join을 사용했어야 했다.
+
+- async
+	. 원하는 함수를 비동기적으로 실행한다.
+- promise
+	. 결과물을 promise 객체를 통해 future로 받아준다.
+- packaged_task
+	. 원하는 함수의 실행 결과를 packaged_task 객체를 통해 future로 받아준다.
+
+
+mutex, condition_variable까지 가지 않고 1회성 작업을 처리하는데 유용하다.
+
+
+
+캐시
+- CPU는 연산을 하고, 메모리에 사용할 자원이 올라가 있다.
+  CPU와 메모리까지의 길이가 멀기 때문에 데이터를 전송하는 시간이 CPU의 연산에 걸리는 시간보다 압도적으로 길다
+  CPU는 캐시라는 개념을 도입하여 메모리에서 데이터를 꺼내올 때 동일한, 혹은 인접한 데이터를 한번에
+  메모리에서 캐시에 올리게 된다. CPU는 사용할 데이터가 캐시에 있을 때 메모리까지 가지 않고 캐시에서 데이터를 꺼내
+  쓰게 된다.
+- 시간적 지역성(Temporal Locality)
+	. 방금 주문한 테이블에서 추가 주문이 나올 확률이 높다.
+- 공간적 지역성(Spetial Locality)
+	. 주문한 근처에 있는 사람이 추가 주문을 할 확률이 높다.
