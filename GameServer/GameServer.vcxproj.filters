@@ -16,6 +16,9 @@
     <ClCompile Include="pch.cpp">
       <Filter>유틸리티</Filter>
     </ClCompile>
+    <ClCompile Include="prev.cpp">
+      <Filter>메인</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
