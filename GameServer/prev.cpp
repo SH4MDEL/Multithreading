@@ -99,28 +99,40 @@ void TaskWorker(std::packaged_task<int64(void)>&& task)
 atomic<bool> ready;
 int32 value;
 
-void Producer()
+
+void Push()
 {
-	value = 0;
-	ready.store(true, memory_order_release);
-	// -------------- 절취선 -------------- 
+	while (true)
+	{
+		int32 value = rand() % 100;
+		q.push(value);
+	}
 }
 
-void Consumer()
+void Pop()
 {
-	// -------------- 절취선 -------------- 
-	while (!ready.load(memory_order_acquire)) {}
-
-	cout << value << endl;
+	while (true)
+	{
+		if (q.empty()) continue;
+		
+		int32 data = q.front();
+		q.pop();
+		cout << data << endl;
+	}
 }
 
 int main()
 {
-	ready.store(false);
-	value = 0;
-	thread t1(Producer);
-	thread t2(Consumer);
+	thread t1(Push);
+	thread t2(Pop);
+
 	t1.join(); t2.join();
+
+	//ready.store(false);
+	//value = 0;
+	//thread t1(Producer);
+	//thread t2(Consumer);
+	//t1.join(); t2.join();
 
 	//// 동기 실행 (synchronous) 실행
 	//{

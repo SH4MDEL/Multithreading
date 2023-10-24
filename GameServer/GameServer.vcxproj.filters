@@ -19,10 +19,22 @@
     <ClCompile Include="prev.cpp">
       <Filter>메인</Filter>
     </ClCompile>
+    <ClCompile Include="ConcurrentStack.cpp">
+      <Filter>메인</Filter>
+    </ClCompile>
+    <ClCompile Include="ConcurrentQueue.cpp">
+      <Filter>메인</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
       <Filter>유틸리티</Filter>
+    </ClInclude>
+    <ClInclude Include="ConcurrentStack.h">
+      <Filter>메인</Filter>
+    </ClInclude>
+    <ClInclude Include="ConcurrentQueue.h">
+      <Filter>메인</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
