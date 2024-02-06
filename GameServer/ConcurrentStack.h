@@ -1,5 +1,94 @@
 #pragma once
 #include <mutex>
+#include "pch.h"
+
+template<typename T>
+class SPLockFreeStack
+{
+private:
+	struct Node;
+	struct CountedNodePtr
+	{
+		int32 externalCount = 0;
+		Node* ptr = nullptr;
+	};
+
+	struct Node
+	{
+		Node(const T& value) : data(make_shared<T>(value))
+		{
+
+		}
+
+		shared_ptr<T> data;
+		atomic<int32> internalCount = 0;
+		CountedNodePtr next;
+	};
+
+public:
+	void Push(const T& value)
+	{
+		CountedNodePtr node;
+		node.ptr = new Node(value);
+		node.externalCount = 1;
+
+		node.ptr->next = m_head;
+		while (!m_head.compare_exchange_weak(node.ptr->next, node)) {}
+	}
+
+	shared_ptr<T> TryPop()
+	{
+		CountedNodePtr oldHead = m_head;
+		while (true)
+		{
+			// 참조권 획득
+			IncreaseHeadCount(oldHead);
+			// 최소한 externalCount가 2보다 크다. 삭제되지 않음
+			Node* ptr = oldHead.ptr;
+
+			// 데이터 없음
+			if (!ptr) return shared_ptr<T>();
+
+			// 소유권 획득 (ptr->next로 head를 바꿔치기 한 쓰레드가 이김)
+			if (m_head.compare_exchange_strong(oldHead, ptr->next)) {
+				shared_ptr<T> res;
+				res.swap(ptr->data);
+
+				// external : 1 -> 2(+1) ->4(나+1, 남+2)
+				// internal : 0
+
+				// 나 말고 또 누가 있는가?
+				const int32 countIncrease = oldHead.externalCount - 2;
+				if (ptr->internalCount.fetch_add(countIncrease) == -countIncrease) delete ptr;
+
+				return res;
+			}
+			else if (ptr->internalCount.fetch_sub(1) == 1){
+				// 참조권은 얻었으나 소유권 획득 실패 -> 뒷수습은 내가 함
+				delete ptr;
+			}
+		}
+	}
+
+private:
+	void IncreaseHeadCount(CountedNodePtr& oldCounter)
+	{
+		while (true)
+		{
+			CountedNodePtr newCounter = oldCounter;
+			newCounter.externalCount++;
+			if (m_head.compare_exchange_strong(oldCounter, newCounter))
+			{
+				oldCounter.externalCount = newCounter.externalCount;
+				break;
+			}
+		}
+	}
+
+private:
+	atomic<CountedNodePtr> m_head;
+};
+
 
 template<typename T>
 class LockFreeStack

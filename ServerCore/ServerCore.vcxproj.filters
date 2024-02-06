@@ -7,24 +7,51 @@
     <Filter Include="유틸리티">
       <UniqueIdentifier>{098ab618-d1c8-45b2-9173-aee5052473f1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="메인">
+      <UniqueIdentifier>{e86378b2-1b72-4e6d-bba8-07f75a110f75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="쓰레드">
+      <UniqueIdentifier>{fe537125-7bce-4711-bc17-9f06d5c4fe54}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pch.h">
-      <Filter>유틸리티</Filter>
+    <ClInclude Include="CoreTLS.h">
+      <Filter>메인</Filter>
     </ClInclude>
-    <ClInclude Include="CorePch.h">
-      <Filter>유틸리티</Filter>
+    <ClInclude Include="CoreMacro.h">
+      <Filter>메인</Filter>
+    </ClInclude>
+    <ClInclude Include="CoreGlobal.h">
+      <Filter>메인</Filter>
     </ClInclude>
     <ClInclude Include="Types.h">
-      <Filter>유틸리티</Filter>
+      <Filter>메인</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>메인</Filter>
+    </ClInclude>
+    <ClInclude Include="CorePch.h">
+      <Filter>메인</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadManager.h">
+      <Filter>쓰레드</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CoreTLS.cpp">
+      <Filter>메인</Filter>
+    </ClCompile>
+    <ClCompile Include="CoreGlobal.cpp">
+      <Filter>메인</Filter>
+    </ClCompile>
     <ClCompile Include="pch.cpp">
-      <Filter>유틸리티</Filter>
+      <Filter>메인</Filter>
     </ClCompile>
     <ClCompile Include="CorePch.cpp">
-      <Filter>유틸리티</Filter>
+      <Filter>메인</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadManager.cpp">
+      <Filter>쓰레드</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

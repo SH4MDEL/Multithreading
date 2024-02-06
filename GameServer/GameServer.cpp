@@ -6,45 +6,23 @@
 #include <atomic>
 #include <mutex>
 #include <future>
-#include "ConcurrentQueue.h"
-#include "ConcurrentStack.h"
+#include "ThreadManager.h"
 
-mutex m;
-LockQueue<int32> q;
-LockFreeStack<int32> s;
+CoreGlobal Core;
 
-void Push()
+void ThreadMain()
 {
 	while (true)
 	{
-		int32 value = rand() % 100;
-		s.Push(value);
-
-		this_thread::sleep_for(10ms);
-	}
-}
-
-void Pop()
-{
-	while (true)
-	{
-		int32 data;
-		if (s.TryPop(data)) {
-			//cout << data << endl;
-		}
+		cout << "Hello " << LThreadId << endl;
+		this_thread::sleep_for(1s);
 	}
 }
 
 int main()
 {
-	thread t1(Push);
-	thread t2(Push);
-	thread t3(Pop);
-	thread t4(Pop);
-	thread t5(Pop);
-
-	t1.join(); t2.join();
-	t3.join(); t4.join();
-	t5.join();
-
+	for (int32 i = 0; i < 5; ++i) {
+		g_threadManager->Launch(ThreadMain);
+	}
+	g_threadManager->Join();
 }
