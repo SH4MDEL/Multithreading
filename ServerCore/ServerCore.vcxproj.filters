@@ -36,6 +36,9 @@
     <ClInclude Include="ThreadManager.h">
       <Filter>쓰레드</Filter>
     </ClInclude>
+    <ClInclude Include="Lock.h">
+      <Filter>쓰레드</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CoreTLS.cpp">
@@ -51,6 +54,9 @@
       <Filter>메인</Filter>
     </ClCompile>
     <ClCompile Include="ThreadManager.cpp">
+      <Filter>쓰레드</Filter>
+    </ClCompile>
+    <ClCompile Include="Lock.cpp">
       <Filter>쓰레드</Filter>
     </ClCompile>
   </ItemGroup>
