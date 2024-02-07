@@ -25,6 +25,8 @@
     <ClCompile Include="ConcurrentQueue.cpp">
       <Filter>메인</Filter>
     </ClCompile>
+    <ClCompile Include="AccountManager.cpp" />
+    <ClCompile Include="PlayerMananger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -36,5 +38,7 @@
     <ClInclude Include="ConcurrentQueue.h">
       <Filter>메인</Filter>
     </ClInclude>
+    <ClInclude Include="AccountManager.h" />
+    <ClInclude Include="PlayerMananger.h" />
   </ItemGroup>
 </Project>

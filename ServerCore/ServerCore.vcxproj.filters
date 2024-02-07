@@ -39,6 +39,9 @@
     <ClInclude Include="Lock.h">
       <Filter>쓰레드</Filter>
     </ClInclude>
+    <ClInclude Include="DeadLockProfiler.h">
+      <Filter>쓰레드</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CoreTLS.cpp">
@@ -57,6 +60,9 @@
       <Filter>쓰레드</Filter>
     </ClCompile>
     <ClCompile Include="Lock.cpp">
+      <Filter>쓰레드</Filter>
+    </ClCompile>
+    <ClCompile Include="DeadLockProfiler.cpp">
       <Filter>쓰레드</Filter>
     </ClCompile>
   </ItemGroup>
